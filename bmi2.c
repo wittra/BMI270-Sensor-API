@@ -241,8 +241,9 @@ static int8_t cfg_error_status(struct bmi2_dev *dev);
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
+#if BMI270_WITH_AUX
 static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev);
-
+#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API sets gyroscope user-gain configurations like gain
  * update value for x, y and z-axis.
@@ -279,6 +280,7 @@ static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config 
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
+#if BMI270_WITH_AUX
 static int8_t set_aux_interface(const struct bmi2_aux_config *config, struct bmi2_dev *dev);
 
 /*!
@@ -323,7 +325,7 @@ static int8_t config_aux(const struct bmi2_aux_config *config, struct bmi2_dev *
  * @retval < 0 -> Fail
  */
 static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev);
-
+#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API gets accelerometer configurations like ODR,
  * bandwidth, performance mode and g-range.
@@ -2404,11 +2406,12 @@ int8_t bmi2_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                     case BMI2_GYRO:
                         rslt = set_gyro_config(&sens_cfg[loop].cfg.gyr, dev);
                         break;
-
+#if BMI270_WITH_AUX
                     /* Set auxiliary configuration */
                     case BMI2_AUX:
                         rslt = set_aux_config(&sens_cfg[loop].cfg.aux, dev);
                         break;
+#endif /* BMI270_WITH_AUX */
 #if BMI270_WITH_GYRO_GAIN
                     /* Set gyroscope user gain configuration */
                     case BMI2_GYRO_GAIN_UPDATE:
@@ -5137,6 +5140,7 @@ static int8_t cfg_error_status(struct bmi2_dev *dev)
  * address.
  * 3)It maps/un-maps data interrupts to that of hardware interrupt line.
  */
+#if BMI270_WITH_AUX
 static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5162,7 +5166,7 @@ static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *de
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API sets gyroscope user-gain configurations like gain
  * update value for x, y and z-axis.
@@ -5245,6 +5249,7 @@ static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config 
     return rslt;
 }
 #endif /* BMI270_WITH_GYRO_GAIN */
+#if BMI270_WITH_AUX
 /*!
  * @brief This internal API enables/disables auxiliary interface.
  */
@@ -5385,7 +5390,7 @@ static int8_t config_aux(const struct bmi2_aux_config *config, struct bmi2_dev *
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API checks the busy status of auxiliary sensor and sets
  * the auxiliary register addresses when not busy.
@@ -5434,6 +5439,7 @@ static int8_t set_if_aux_not_busy(uint8_t reg_addr, uint8_t reg_data, struct bmi
 /*!
  * @brief This internal API validates auxiliary configuration set by the user.
  */
+#if BMI270_WITH_AUX
 static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5444,7 +5450,7 @@ static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_de
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API gets accelerometer configurations like ODR,
  * bandwidth, performance mode and g-range.
