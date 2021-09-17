@@ -1259,6 +1259,10 @@
 #define BMI2_ASDA_PUPSEL_10K                      UINT8_C(0x02)
 #define BMI2_ASDA_PUPSEL_2K                       UINT8_C(0x03)
 
+/* Feature toggles */
+#ifndef BMI270_WITH_MOTION
+#define BMI270_WITH_MOTION 1
+#endif  /* BMI270_WITH_MOTION */
 /******************************************************************************/
 /*! @name           Function Pointers                             */
 /******************************************************************************/

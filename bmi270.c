@@ -785,6 +785,7 @@ static int8_t set_wrist_wear_wake_up(uint8_t enable, struct bmi2_dev *dev);
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
+#if BMI270_WITH_MOTION
 static int8_t set_any_motion_config(const struct bmi2_any_motion_config *config, struct bmi2_dev *dev);
 
 /*!
@@ -928,7 +929,7 @@ static int8_t set_wrist_gest_config(const struct bmi2_wrist_gest_config *config,
  * @retval < 0 -> Fail
  */
 static int8_t set_wrist_wear_wake_up_config(const struct bmi2_wrist_wear_wake_up_config *config, struct bmi2_dev *dev);
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API gets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
@@ -1417,6 +1418,7 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
             {
                 rslt = bmi2_set_sensor_config(&sens_cfg[loop], 1, dev);
             }
+#if BMI270_WITH_MOTION
             else
             {
                 /* Disable Advance power save if enabled for auxiliary
@@ -1483,6 +1485,7 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                     break;
                 }
             }
+#endif /* BMI270_WITH_MOTION */
         }
 
         /* Enable Advance power save if disabled while configuring and
@@ -2904,6 +2907,7 @@ static int8_t set_gyro_user_gain(uint8_t enable, struct bmi2_dev *dev)
  * @brief This internal API sets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
  */
+#if BMI270_WITH_MOTION
 static int8_t set_any_motion_config(const struct bmi2_any_motion_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -3533,7 +3537,7 @@ static int8_t set_wrist_wear_wake_up_config(const struct bmi2_wrist_wear_wake_up
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API gets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
