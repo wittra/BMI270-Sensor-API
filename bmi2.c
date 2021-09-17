@@ -266,8 +266,9 @@ static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *de
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
+#if BMI270_WITH_GYRO_GAIN
 static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config *config, struct bmi2_dev *dev);
-
+#endif /* BMI270_WITH_GYRO_GAIN */
 /*!
  * @brief This internal API enables/disables auxiliary interface.
  *
@@ -2408,12 +2409,12 @@ int8_t bmi2_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                     case BMI2_AUX:
                         rslt = set_aux_config(&sens_cfg[loop].cfg.aux, dev);
                         break;
-
+#if BMI270_WITH_GYRO_GAIN
                     /* Set gyroscope user gain configuration */
                     case BMI2_GYRO_GAIN_UPDATE:
                         rslt = set_gyro_user_gain_config(&sens_cfg[loop].cfg.gyro_gain_update, dev);
                         break;
-
+#endif /* BMI270_WITH_GYRO_GAIN */
                     default:
                         rslt = BMI2_E_INVALID_SENSOR;
                         break;
@@ -5166,6 +5167,7 @@ static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *de
  * @brief This internal API sets gyroscope user-gain configurations like gain
  * update value for x, y and z-axis.
  */
+#if BMI270_WITH_GYRO_GAIN
 static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5242,7 +5244,7 @@ static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config 
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_GYRO_GAIN */
 /*!
  * @brief This internal API enables/disables auxiliary interface.
  */
