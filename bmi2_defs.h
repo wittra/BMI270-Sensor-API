@@ -1264,13 +1264,6 @@
 #define BMI270_WITH_MOTION 1
 #endif  /* BMI270_WITH_MOTION */
 
-#ifndef BMI270_WITH_AUX
-#define BMI270_WITH_AUX 1
-#endif  /* BMI270_WITH_AUX */
-
-#ifndef BMI270_WITH_GYRO_GAIN
-#define BMI270_WITH_GYRO_GAIN 1
-#endif  /* BMI270_WITH_GYRO_GAIN */
 /******************************************************************************/
 /*! @name           Function Pointers                             */
 /******************************************************************************/

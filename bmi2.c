@@ -140,7 +140,7 @@ static int8_t set_config_load(uint8_t enable, struct bmi2_dev *dev);
  * @retval < 0 -> Fail
  */
 static int8_t upload_file(const uint8_t *config_data, uint16_t index, uint16_t write_len, struct bmi2_dev *dev);
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief  This internal API sets accelerometer configurations like ODR,
  * bandwidth, performance mode and g-range.
@@ -241,9 +241,9 @@ static int8_t cfg_error_status(struct bmi2_dev *dev);
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
-#if BMI270_WITH_AUX
+
 static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev);
-#endif /* BMI270_WITH_AUX */
+
 /*!
  * @brief This internal API sets gyroscope user-gain configurations like gain
  * update value for x, y and z-axis.
@@ -267,9 +267,8 @@ static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *de
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
-#if BMI270_WITH_GYRO_GAIN
 static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config *config, struct bmi2_dev *dev);
-#endif /* BMI270_WITH_GYRO_GAIN */
+
 /*!
  * @brief This internal API enables/disables auxiliary interface.
  *
@@ -280,7 +279,7 @@ static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config 
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
-#if BMI270_WITH_AUX
+
 static int8_t set_aux_interface(const struct bmi2_aux_config *config, struct bmi2_dev *dev);
 
 /*!
@@ -325,7 +324,7 @@ static int8_t config_aux(const struct bmi2_aux_config *config, struct bmi2_dev *
  * @retval < 0 -> Fail
  */
 static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev);
-#endif /* BMI270_WITH_AUX */
+
 /*!
  * @brief This internal API gets accelerometer configurations like ODR,
  * bandwidth, performance mode and g-range.
@@ -1419,7 +1418,7 @@ static int8_t read_gyro_xyz(struct bmi2_sens_axes_data *gyro, struct bmi2_dev *d
  * @retval < 0 -> Fail
  */
 static int8_t check_boundary_val(uint8_t *val, uint8_t min, uint8_t max, struct bmi2_dev *dev);
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API is used to validate the device pointer for
  * null conditions.
@@ -1432,6 +1431,7 @@ static int8_t check_boundary_val(uint8_t *val, uint8_t min, uint8_t max, struct 
  */
 static int8_t null_ptr_check(const struct bmi2_dev *dev);
 
+#if BMI270_WITH_MOTION
 /*!
  * @brief This updates the result for CRT or gyro self-test.
  *
@@ -1659,6 +1659,7 @@ static int8_t verify_foc_position(uint8_t sens_list,
 static int8_t get_average_of_sensor_data(uint8_t sens_list,
                                          struct bmi2_foc_temp_value *temp_foc_data,
                                          struct bmi2_dev *dev);
+#endif /* BMI270_WITH_MOTION */
 
 /*!
  * @brief This internal api gets major and minor version for config file
@@ -1673,6 +1674,7 @@ static int8_t get_average_of_sensor_data(uint8_t sens_list,
  */
 static int8_t extract_config_file(uint8_t *config_major, uint8_t *config_minor, struct bmi2_dev *dev);
 
+#if BMI270_WITH_MOTION
 /*!
  * @brief This internal API is used to map the interrupts to the sensor.
  *
@@ -1684,6 +1686,7 @@ static int8_t extract_config_file(uint8_t *config_major, uint8_t *config_minor, 
  * @retval None
  */
 static void extract_feat_int_map(struct bmi2_map_int *map_int, uint8_t type, const struct bmi2_dev *dev);
+#endif /* BMI270_WITH_MOTION */
 
 /*!
  * @brief This internal API selects the sensors/features to be enabled or
@@ -2393,6 +2396,7 @@ int8_t bmi2_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                 rslt = bmi2_set_adv_power_save(BMI2_DISABLE, dev);
             }
 
+#if BMI270_WITH_MOTION
             if (rslt == BMI2_OK)
             {
                 switch (sens_cfg[loop].type)
@@ -2406,23 +2410,20 @@ int8_t bmi2_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                     case BMI2_GYRO:
                         rslt = set_gyro_config(&sens_cfg[loop].cfg.gyr, dev);
                         break;
-#if BMI270_WITH_AUX
                     /* Set auxiliary configuration */
                     case BMI2_AUX:
                         rslt = set_aux_config(&sens_cfg[loop].cfg.aux, dev);
                         break;
-#endif /* BMI270_WITH_AUX */
-#if BMI270_WITH_GYRO_GAIN
                     /* Set gyroscope user gain configuration */
                     case BMI2_GYRO_GAIN_UPDATE:
                         rslt = set_gyro_user_gain_config(&sens_cfg[loop].cfg.gyro_gain_update, dev);
                         break;
-#endif /* BMI270_WITH_GYRO_GAIN */
                     default:
                         rslt = BMI2_E_INVALID_SENSOR;
                         break;
                 }
             }
+#endif /* BMI270_WITH_MOTION */
 
             /* Return error if any of the set configurations fail */
             if (rslt != BMI2_OK)
@@ -2484,6 +2485,7 @@ int8_t bmi2_get_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                 }
             }
 
+#if BMI270_WITH_MOTION
             if (rslt == BMI2_OK)
             {
                 switch (sens_cfg[loop].type)
@@ -2513,6 +2515,7 @@ int8_t bmi2_get_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sens,
                         break;
                 }
             }
+#endif /* BMI270_WITH_MOTION */
 
             /* Return error if any of the get configurations fail */
             if (rslt != BMI2_OK)
@@ -2575,6 +2578,7 @@ int8_t bmi2_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_sens
                 }
             }
 
+#if BMI270_WITH_MOTION
             if (rslt == BMI2_OK)
             {
                 switch (sensor_data[loop].type)
@@ -2617,6 +2621,7 @@ int8_t bmi2_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_sens
                     break;
                 }
             }
+#endif /* BMI270_WITH_MOTION */
 
             /* Enable Advance power save if disabled while
              * configuring and not when already disabled
@@ -2634,7 +2639,7 @@ int8_t bmi2_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_sens
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This API sets the FIFO configuration in the sensor.
  */
@@ -2993,7 +2998,7 @@ int8_t bmi2_extract_aux(struct bmi2_aux_fifo_data *aux,
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This API writes the available sensor specific commands to the sensor.
  */
@@ -3012,7 +3017,7 @@ int8_t bmi2_set_command_register(uint8_t command, struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*
  * @brief This API sets the FIFO self wake up functionality in the sensor.
  */
@@ -3585,7 +3590,7 @@ int8_t bmi2_write_aux_interleaved(uint8_t reg_addr, const uint8_t *aux_data, uin
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This API gets the data ready status of accelerometer, gyroscope,
  * auxiliary, command decoder and busy status of auxiliary.
@@ -3665,7 +3670,7 @@ int8_t bmi2_write_sync_commands(const uint8_t *command, uint8_t n_comm, struct b
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This API performs self-test to check the proper functionality of the
  * accelerometer sensor.
@@ -4436,7 +4441,7 @@ int8_t bmi2_get_gyro_cross_sense(struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This API gets Error bits and message indicating internal status.
  */
@@ -4472,7 +4477,7 @@ int8_t bmi2_get_internal_status(uint8_t *int_stat, struct bmi2_dev *dev)
 
 /* Suppressing doxygen warnings triggered for same static function names present across various sensor variant
  * directories */
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This API verifies and allows only the correct position to do Fast Offset Compensation for
  * accelerometer & gyro.
@@ -4725,7 +4730,7 @@ int8_t bmi2_perform_gyro_foc(struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This API is used to get the feature configuration from the
  * selected page.
@@ -5003,7 +5008,7 @@ static int8_t upload_file(const uint8_t *config_data, uint16_t index, uint16_t w
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This internal API validates bandwidth and performance mode of the
  * accelerometer set by the user.
@@ -5140,7 +5145,6 @@ static int8_t cfg_error_status(struct bmi2_dev *dev)
  * address.
  * 3)It maps/un-maps data interrupts to that of hardware interrupt line.
  */
-#if BMI270_WITH_AUX
 static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5166,12 +5170,10 @@ static int8_t set_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *de
 
     return rslt;
 }
-#endif /* BMI270_WITH_AUX */
 /*!
  * @brief This internal API sets gyroscope user-gain configurations like gain
  * update value for x, y and z-axis.
  */
-#if BMI270_WITH_GYRO_GAIN
 static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5248,8 +5250,6 @@ static int8_t set_gyro_user_gain_config(const struct bmi2_gyro_user_gain_config 
 
     return rslt;
 }
-#endif /* BMI270_WITH_GYRO_GAIN */
-#if BMI270_WITH_AUX
 /*!
  * @brief This internal API enables/disables auxiliary interface.
  */
@@ -5390,7 +5390,7 @@ static int8_t config_aux(const struct bmi2_aux_config *config, struct bmi2_dev *
 
     return rslt;
 }
-#endif /* BMI270_WITH_AUX */
+
 /*!
  * @brief This internal API checks the busy status of auxiliary sensor and sets
  * the auxiliary register addresses when not busy.
@@ -5439,7 +5439,6 @@ static int8_t set_if_aux_not_busy(uint8_t reg_addr, uint8_t reg_data, struct bmi
 /*!
  * @brief This internal API validates auxiliary configuration set by the user.
  */
-#if BMI270_WITH_AUX
 static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -5450,7 +5449,7 @@ static int8_t validate_aux_config(struct bmi2_aux_config *config, struct bmi2_de
 
     return rslt;
 }
-#endif /* BMI270_WITH_AUX */
+
 /*!
  * @brief This internal API gets accelerometer configurations like ODR,
  * bandwidth, performance mode and g-range.
@@ -8747,7 +8746,7 @@ static void saturate_gyro_data(struct bmi2_sens_axes_data *gyr_off)
         gyr_off->z = -512;
     }
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API is used to validate the device structure pointer for
  * null conditions.
@@ -8764,7 +8763,7 @@ static int8_t null_ptr_check(const struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This internal API is to get the status of st_status from gry_crt_conf register
  */
@@ -9435,7 +9434,7 @@ static int8_t set_maxburst_len(const uint16_t write_len_byte, struct bmi2_dev *d
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This api is used to trigger the preparation for system for NVM programming.
  */
@@ -9488,7 +9487,7 @@ static int8_t set_nvm_prep_prog(uint8_t nvm_prep, struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This api is used to enable the CRT.
  */
@@ -9776,7 +9775,7 @@ static int8_t validate_foc_accel_axis(int16_t avg_foc_data, struct bmi2_dev *dev
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*! @brief This api is used for programming the non volatile memory(nvm) */
 int8_t bmi2_nvm_prog(struct bmi2_dev *dev)
 {
@@ -9870,7 +9869,7 @@ int8_t bmi2_nvm_prog(struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This API reads and provides average for 128 samples of sensor data for foc operation
  * gyro.
@@ -9947,7 +9946,7 @@ static int8_t get_average_of_sensor_data(uint8_t sens_list,
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API extract the identification feature from the DMR page
  * and retrieve the config file major and minor version.
@@ -10030,7 +10029,7 @@ static int8_t extract_config_file(uint8_t *config_major, uint8_t *config_minor, 
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  *@brief This internal API is used to map the interrupts to the sensor.
  */
@@ -10214,7 +10213,7 @@ static int8_t get_gyro_cross_sense(int16_t *cross_sense, struct bmi2_dev *dev)
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This internal API selects the sensor/features to be enabled or
  * disabled.
@@ -10231,6 +10230,7 @@ static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *
     {
         switch (sens_list[count])
         {
+#if BMI270_WITH_MOTION
             case BMI2_ACCEL:
                 *sensor_sel |= BMI2_ACCEL_SENS_SEL;
                 break;
@@ -10240,6 +10240,7 @@ static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *
             case BMI2_AUX:
                 *sensor_sel |= BMI2_AUX_SENS_SEL;
                 break;
+#endif /* BMI270_WITH_MOTION */
             case BMI2_TEMP:
                 *sensor_sel |= BMI2_TEMP_SENS_SEL;
                 break;
@@ -10266,6 +10267,7 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
     rslt = bmi2_get_regs(BMI2_PWR_CTRL_ADDR, &reg_data, 1, dev);
     if (rslt == BMI2_OK)
     {
+#if BMI270_WITH_MOTION
         /* Enable accelerometer */
         if (sensor_sel & BMI2_ACCEL_SENS_SEL)
         {
@@ -10283,7 +10285,7 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             reg_data = BMI2_SET_BIT_POS0(reg_data, BMI2_AUX_EN, BMI2_ENABLE);
         }
-
+#endif /* BMI270_WITH_MOTION */
         /* Enable temperature sensor */
         if (sensor_sel & BMI2_TEMP_SENS_SEL)
         {
@@ -10314,6 +10316,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
     rslt = bmi2_get_regs(BMI2_PWR_CTRL_ADDR, &reg_data, 1, dev);
     if (rslt == BMI2_OK)
     {
+#if BMI270_WITH_MOTION
         /* Disable accelerometer */
         if (sensor_sel & BMI2_ACCEL_SENS_SEL)
         {
@@ -10331,7 +10334,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             reg_data = BMI2_SET_BIT_VAL0(reg_data, BMI2_AUX_EN);
         }
-
+#endif /* BMI270_WITH_MOTION */
         /* Disable temperature sensor */
         if (sensor_sel & BMI2_TEMP_SENS_SEL)
         {

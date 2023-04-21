@@ -582,6 +582,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev);
  */
 static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *sensor_sel);
 
+#if BMI270_WITH_MOTION
 /*!
  * @brief This internal API is used to enable/disable any-motion feature.
  *
@@ -785,7 +786,6 @@ static int8_t set_wrist_wear_wake_up(uint8_t enable, struct bmi2_dev *dev);
  * @retval 0 -> Success
  * @retval < 0 -> Fail
  */
-#if BMI270_WITH_MOTION
 static int8_t set_any_motion_config(const struct bmi2_any_motion_config *config, struct bmi2_dev *dev);
 
 /*!
@@ -929,7 +929,7 @@ static int8_t set_wrist_gest_config(const struct bmi2_wrist_gest_config *config,
  * @retval < 0 -> Fail
  */
 static int8_t set_wrist_wear_wake_up_config(const struct bmi2_wrist_wear_wake_up_config *config, struct bmi2_dev *dev);
-#endif /* BMI270_WITH_MOTION */
+
 /*!
  * @brief This internal API gets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
@@ -1230,6 +1230,7 @@ static int8_t enable_gyro_gain(uint8_t enable, struct bmi2_dev *dev);
 static uint8_t extract_output_feat_config(struct bmi2_feature_config *feat_output,
                                           uint8_t type,
                                           const struct bmi2_dev *dev);
+#endif /* BMI270_WITH_MOTION */
 
 /***************************************************************************/
 
@@ -1319,9 +1320,10 @@ int8_t bmi270_init(struct bmi2_dev *dev)
              * to device structure
              */
             dev->sens_int_map = BMI270_MAX_INT_MAP;
-
+#if BMI270_WITH_MOTION
             /* Get the gyroscope cross axis sensitivity */
             rslt = bmi2_get_gyro_cross_sense(dev);
+#endif /* BMI270_WITH_MOTION */
         }
     }
 
@@ -1413,13 +1415,14 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
 
         for (loop = 0; loop < n_sens; loop++)
         {
+#if BMI270_WITH_MOTION
             if ((sens_cfg[loop].type == BMI2_ACCEL) || (sens_cfg[loop].type == BMI2_GYRO) ||
                 (sens_cfg[loop].type == BMI2_AUX) || (sens_cfg[loop].type == BMI2_GYRO_GAIN_UPDATE))
             {
                 rslt = bmi2_set_sensor_config(&sens_cfg[loop], 1, dev);
             }
-#if BMI270_WITH_MOTION
             else
+#endif /* BMI270_WITH_MOTION */
             {
                 /* Disable Advance power save if enabled for auxiliary
                  * and feature configurations
@@ -1432,6 +1435,7 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                     rslt = bmi2_set_adv_power_save(BMI2_DISABLE, dev);
                 }
 
+#if BMI270_WITH_MOTION
                 if (rslt == BMI2_OK)
                 {
                     switch (sens_cfg[loop].type)
@@ -1478,6 +1482,7 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                             break;
                     }
                 }
+#endif /* BMI270_WITH_MOTION */
 
                 /* Return error if any of the set configurations fail */
                 if (rslt != BMI2_OK)
@@ -1485,7 +1490,6 @@ int8_t bmi270_set_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                     break;
                 }
             }
-#endif /* BMI270_WITH_MOTION */
         }
 
         /* Enable Advance power save if disabled while configuring and
@@ -1526,12 +1530,14 @@ int8_t bmi270_get_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
         aps_stat = dev->aps_status;
         for (loop = 0; loop < n_sens; loop++)
         {
+#if BMI270_WITH_MOTION
             if ((sens_cfg[loop].type == BMI2_ACCEL) || (sens_cfg[loop].type == BMI2_GYRO) ||
                 (sens_cfg[loop].type == BMI2_AUX) || (sens_cfg[loop].type == BMI2_GYRO_GAIN_UPDATE))
             {
                 rslt = bmi2_get_sensor_config(&sens_cfg[loop], 1, dev);
             }
             else
+#endif /* BMI270_WITH_MOTION */
             {
                 /* Disable Advance power save if enabled for auxiliary
                  * and feature configurations
@@ -1548,6 +1554,7 @@ int8_t bmi270_get_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                     }
                 }
 
+#if BMI270_WITH_MOTION
                 if (rslt == BMI2_OK)
                 {
                     switch (sens_cfg[loop].type)
@@ -1594,7 +1601,7 @@ int8_t bmi270_get_sensor_config(struct bmi2_sens_config *sens_cfg, uint8_t n_sen
                             break;
                     }
                 }
-
+#endif /* BMI270_WITH_MOTION */
                 /* Return error if any of the get configurations fail */
                 if (rslt != BMI2_OK)
                 {
@@ -1643,6 +1650,7 @@ int8_t bmi270_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_se
         aps_stat = dev->aps_status;
         for (loop = 0; loop < n_sens; loop++)
         {
+#if BMI270_WITH_MOTION
             if ((sensor_data[loop].type == BMI2_ACCEL) || (sensor_data[loop].type == BMI2_GYRO) ||
                 (sensor_data[loop].type == BMI2_AUX) || (sensor_data[loop].type == BMI2_GYRO_GAIN_UPDATE) ||
                 (sensor_data[loop].type == BMI2_GYRO_CROSS_SENSE))
@@ -1650,6 +1658,7 @@ int8_t bmi270_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_se
                 rslt = bmi2_get_sensor_data(&sensor_data[loop], 1, dev);
             }
             else
+#endif /* BMI270_WITH_MOTION */
             {
                 /* Disable Advance power save if enabled for feature
                  * configurations
@@ -1665,6 +1674,7 @@ int8_t bmi270_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_se
                     }
                 }
 
+#if BMI270_WITH_MOTION
                 if (rslt == BMI2_OK)
                 {
                     switch (sensor_data[loop].type)
@@ -1705,6 +1715,7 @@ int8_t bmi270_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_se
                         break;
                     }
                 }
+#endif /* BMI270_WITH_MOTION */
             }
 
             /* Enable Advance power save if disabled while
@@ -1723,7 +1734,7 @@ int8_t bmi270_get_sensor_data(struct bmi2_sensor_data *sensor_data, uint8_t n_se
 
     return rslt;
 }
-
+#if BMI270_WITH_MOTION
 /*!
  * @brief This API updates the gyroscope user-gain.
  */
@@ -1856,7 +1867,7 @@ int8_t bmi270_read_gyro_user_gain(struct bmi2_gyro_user_gain_data *gyr_usr_gain,
 
     return rslt;
 }
-
+#endif /* BMI270_WITH_MOTION */
 /*!
  * @brief This API maps/unmaps feature interrupts to that of interrupt pins.
  */
@@ -1946,6 +1957,7 @@ static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *
     {
         switch (sens_list[count])
         {
+#if BMI270_WITH_MOTION
             case BMI2_ACCEL:
                 *sensor_sel |= BMI2_ACCEL_SENS_SEL;
                 break;
@@ -1955,9 +1967,11 @@ static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *
             case BMI2_AUX:
                 *sensor_sel |= BMI2_AUX_SENS_SEL;
                 break;
+#endif /* BMI270_WITH_MOTION */
             case BMI2_TEMP:
                 *sensor_sel |= BMI2_TEMP_SENS_SEL;
                 break;
+#if BMI270_WITH_MOTION
             case BMI2_SIG_MOTION:
                 *sensor_sel |= BMI2_SIG_MOTION_SEL;
                 break;
@@ -1988,6 +2002,7 @@ static int8_t select_sensor(const uint8_t *sens_list, uint8_t n_sens, uint64_t *
             case BMI2_WRIST_WEAR_WAKE_UP:
                 *sensor_sel |= BMI2_WRIST_WEAR_WAKE_UP_SEL;
                 break;
+#endif /* BMI270_WITH_MOTION */
             default:
                 rslt = BMI2_E_INVALID_SENSOR;
                 break;
@@ -2017,6 +2032,7 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
     rslt = bmi2_get_regs(BMI2_PWR_CTRL_ADDR, &reg_data, 1, dev);
     if (rslt == BMI2_OK)
     {
+#if BMI270_WITH_MOTION
         /* Enable accelerometer */
         if (sensor_sel & BMI2_ACCEL_SENS_SEL)
         {
@@ -2028,13 +2044,12 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             reg_data = BMI2_SET_BITS(reg_data, BMI2_GYR_EN, BMI2_ENABLE);
         }
-
         /* Enable auxiliary sensor */
         if (sensor_sel & BMI2_AUX_SENS_SEL)
         {
             reg_data = BMI2_SET_BIT_POS0(reg_data, BMI2_AUX_EN, BMI2_ENABLE);
         }
-
+#endif /* BMI270_WITH_MOTION */
         /* Enable temperature sensor */
         if (sensor_sel & BMI2_TEMP_SENS_SEL)
         {
@@ -2062,6 +2077,7 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             while (loop--)
             {
+#if BMI270_WITH_MOTION
                 /* Enable sig-motion feature */
                 if (sensor_sel & BMI2_SIG_MOTION_SEL)
                 {
@@ -2201,6 +2217,7 @@ static int8_t sensor_enable(uint64_t sensor_sel, struct bmi2_dev *dev)
                         break;
                     }
                 }
+#endif /* BMI270_WITH_MOTION */
             }
 
             /* Enable Advance power save if disabled while
@@ -2236,6 +2253,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
     rslt = bmi2_get_regs(BMI2_PWR_CTRL_ADDR, &reg_data, 1, dev);
     if (rslt == BMI2_OK)
     {
+#if BMI270_WITH_MOTION
         /* Disable accelerometer */
         if (sensor_sel & BMI2_ACCEL_SENS_SEL)
         {
@@ -2247,13 +2265,12 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             reg_data = BMI2_SET_BIT_VAL0(reg_data, BMI2_GYR_EN);
         }
-
         /* Disable auxiliary sensor */
         if (sensor_sel & BMI2_AUX_SENS_SEL)
         {
             reg_data = BMI2_SET_BIT_VAL0(reg_data, BMI2_AUX_EN);
         }
-
+#endif /* BMI270_WITH_MOTION */
         /* Disable temperature sensor */
         if (sensor_sel & BMI2_TEMP_SENS_SEL)
         {
@@ -2281,6 +2298,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
         {
             while (loop--)
             {
+#if BMI270_WITH_MOTION
                 /* Disable sig-motion feature */
                 if (sensor_sel & BMI2_SIG_MOTION_SEL)
                 {
@@ -2420,6 +2438,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
                         break;
                     }
                 }
+#endif /* BMI270_WITH_MOTION */
 
                 /* Enable Advance power save if disabled while
                  * configuring and not when already disabled
@@ -2435,6 +2454,7 @@ static int8_t sensor_disable(uint64_t sensor_sel, struct bmi2_dev *dev)
     return rslt;
 }
 
+#if BMI270_WITH_MOTION
 /*!
  * @brief This internal API is used to enable/disable any motion feature.
  */
@@ -2907,7 +2927,6 @@ static int8_t set_gyro_user_gain(uint8_t enable, struct bmi2_dev *dev)
  * @brief This internal API sets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
  */
-#if BMI270_WITH_MOTION
 static int8_t set_any_motion_config(const struct bmi2_any_motion_config *config, struct bmi2_dev *dev)
 {
     /* Variable to define error */
@@ -3537,7 +3556,7 @@ static int8_t set_wrist_wear_wake_up_config(const struct bmi2_wrist_wear_wake_up
 
     return rslt;
 }
-#endif /* BMI270_WITH_MOTION */
+
 /*!
  * @brief This internal API gets any-motion configurations like axes select,
  * duration, threshold and output-configuration.
@@ -4453,3 +4472,4 @@ static uint8_t extract_output_feat_config(struct bmi2_feature_config *feat_outpu
     /* Return flag */
     return feat_found;
 }
+#endif /* BMI270_WITH_MOTION */
